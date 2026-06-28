@@ -7,10 +7,10 @@
 #include <Pins.h>
 #include <General.h>
 
-
 void setup()
 {
 PINS_init();
+display_init();
 Sensor_Init();
 }
 
