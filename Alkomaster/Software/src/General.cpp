@@ -1,5 +1,4 @@
 #include <General.h>
 void Sensor_Init(){
-    high_score  = 0;
-    battery_state   =  0;
+    // extern MQ3 Sensor(ADC_pin, true, 1500.0f); // Pin 4 (A4) for ADCi
 }
