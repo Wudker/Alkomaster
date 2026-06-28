@@ -10,3 +10,5 @@ enum Power_state{
 void Sensor_Init();
 void Peripheral_power_supply_ON();
 void Peripheral_power_supply_OFF();
+void Heater_on();
+void Heater_off();

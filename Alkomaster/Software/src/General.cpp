@@ -16,3 +16,11 @@ void Peripheral_power_supply_OFF()
 {
     digitalWrite(Power_mosfet_driver_pin, LOW);
 }
+
+void Heater_on(){
+    digitalWrite(Heater_power_pin, HIGH);
+}
+void Heater_off()
+{
+    digitalWrite(Heater_power_pin, LOW);
+}
