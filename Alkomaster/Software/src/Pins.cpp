@@ -2,6 +2,9 @@
 #include <Pins.h>
 #include <esp_sleep.h>
 #include "driver/gpio.h"
+#include <General.h>
+extern Power_state Peripheral_power;
+bool Wakeup_flag=false;
 
 void PINS_init()
 {
@@ -30,4 +33,5 @@ void Enter_deep_sleep()
     esp_deep_sleep_enable_gpio_wakeup(wakeMask, ESP_GPIO_WAKEUP_GPIO_HIGH);
 
     esp_deep_sleep_start();
+    Wakeup_flag = ON;
 }

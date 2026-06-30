@@ -4,3 +4,4 @@
 #define Heater_power_pin 13
 
 void PINS_init();
+void Enter_deep_sleep();
