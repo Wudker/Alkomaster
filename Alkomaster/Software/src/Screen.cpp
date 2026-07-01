@@ -12,6 +12,7 @@ void Clearline(uint8_t linia, uint8_t size)
 
 void slowodruk(const char *tekst, uint8_t linia, int Size)
 {
+    Serial.printf("[DISPLAY] slowodruk: %s\n", tekst);
     Clearline(linia, Size);
     display.setTextSize(Size);
     display.setTextColor(SSD1306_WHITE);
@@ -24,13 +25,26 @@ void slowodruk(const char *tekst, uint8_t linia, int Size)
 }
 
 void display_init(){
-    if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
+    Serial.println("[DISPLAY] Skipping I2C scan - going straight to init");
+    
+    Serial.printf("[DISPLAY] Trying to initialize OLED at 0x%02X\n", SCREEN_ADDRESS);
+    
+    uint8_t attempts = 0;
+    while (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS) && attempts < 3)
     {
-        while (1)
-        {
-            delay(100);
-        }
+        Serial.printf("[DISPLAY] Init failed (attempt %d/3), retrying...\n", attempts + 1);
+        delay(200);
+        attempts++;
     }
+    
+    if (attempts >= 3)
+    {
+        Serial.println("[ERROR] OLED display not responding!");
+        Serial.println("[ERROR] Continuing without display...");
+        return;
+    }
+    
+    Serial.println("[DISPLAY] Display initialized successfully!");
     display.clearDisplay();
     display.display();
 }

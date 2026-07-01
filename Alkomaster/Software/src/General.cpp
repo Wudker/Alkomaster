@@ -37,17 +37,22 @@ float sensor_read(){
 }
 
 void Start_system(){
+    Serial.println("[START_SYSTEM] Turning on peripherals");
     Peripheral_power_supply_ON();
     delay(100);
 
+    Serial.println("[START_SYSTEM] Initializing display");
     display_init();
+    Serial.println("[START_SYSTEM] Display OK");
 
+    Serial.println("[START_SYSTEM] Turning on heater");
     Heater_on();
 
     heatingStart = millis();
     lastActivity = millis();
 
-    Peripheral_power = ON;
 
+    Serial.println("[START_SYSTEM] Showing prompt");
     slowodruk("Prosze zaczekac", 1, 1);
+    Serial.println("[START_SYSTEM] Done");
 }
