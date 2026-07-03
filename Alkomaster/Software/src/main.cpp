@@ -12,6 +12,8 @@ extern Power_state Peripheral_power;
 extern uint32_t inactive_time;
 extern uint32_t lastActivity;
 bool sensorReady = false;
+extern bool Wakeup_flag;
+
 
 
 void setup()
@@ -19,19 +21,36 @@ void setup()
     Serial.begin(115200);
     delay(100);
 
-    Wire.begin(6, 5);
     PINS_init();
+
+    Display_on();          
+    delay(200);           
+    Wire.begin(6, 5);
 
     if (display_init())
     {
         Serial.println("[DISPLAY] Display initialized successfully!");
+        screen_print(0, "DISPLAY OK");
     }
     else
     {
         Serial.println("[ERROR] Display initialization failed!");
     }
 
+    Sensor_off();
+
+    esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+
+    if (wakeup_reason == ESP_SLEEP_WAKEUP_GPIO)
+    {
+        Peripheral_power = HEATING;
+    }
+    else
+    {
+        Peripheral_power = SLEEP;
+    }
 }
+
 
 
 
@@ -39,24 +58,21 @@ void loop()
 {
     switch (Peripheral_power)
     {
-        case OFF:
-        {
-            Heater_off();
-            screen_print(1, "OFF");
-            delay(1000);
 
-            Peripheral_power = HEATING;
+        
+        case SLEEP:
+        {
+            screen_print(1, "SLEEP"); //debug
+            delay(1000);
+            Deep_sleep_init();
             break;
         }
 
         case HEATING:
         {
-            screen_print(1, "HEATING");
-            Heater_on();
-
-
-            // Kalibracja tylko w czystym powietrzu
-            Sensor_Init();
+            Display_on();
+            screen_print(1, "HEATING");//debug
+            Sensor_on();
 
             Peripheral_power = MEASURING;
             break;
@@ -64,9 +80,9 @@ void loop()
 
         case MEASURING:
         {
-            screen_print(1, "MEASURING");
-
-            for (int i = 0; i < 10000; i++)
+            screen_print(1, "MEASURING");//debug
+            lastActivity = millis();
+            while (millis() - lastActivity < inactive_time)
             {
                 int raw = analogRead(ADC_PIN_SENSOR);
                 float voltage = raw * 3.3f / 4095.0f;
@@ -88,11 +104,10 @@ void loop()
 
                 screen_printf(3, 1, "ADC:%d", raw);
 
-                delay(5);
             }
 
             screen_clear();
-            Peripheral_power = OFF;
+            Peripheral_power = SLEEP;
             break;
         }
     }

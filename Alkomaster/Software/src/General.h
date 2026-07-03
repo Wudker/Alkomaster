@@ -6,14 +6,13 @@ extern char high_score_display[20];
 extern float high_score;
 enum Power_state
 {
-    OFF,
+    SLEEP,
     HEATING,
-    READY,
     MEASURING
 };
 void Sensor_Init();
-void Peripheral_power_supply_ON();
-void Peripheral_power_supply_OFF();
-void Heater_on();
-void Heater_off();
+void Display_on();
+void Display_off();
+void Sensor_off();
+void Sensor_on();
 float sensor_read();

@@ -40,7 +40,7 @@ MQ3::MQ3(uint8_t pin, bool isPower5v, float res2)
  */
 void MQ3::begin(uint32_t time)
 {
-  delay(time); //timer insted of delay(20000) to heat probe sensor to ready
+  delay(time); //timer insted of delay to heat probe sensor to ready
   _resO=0;
 
   uint8_t count=10;
@@ -75,7 +75,26 @@ float MQ3::readAlcoholConcentration(uint8_t unit)
  */
 float MQ3::readRawValueOfAlcohol()
 {
-  return 0.4 * pow(MQ3::calculateRS()/_resO, -1.43068);
+    float RS = calculateRS();
+
+    if (isnan(RS) || isinf(RS))
+    {
+        return NAN;
+    }
+
+    if (_resO <= 0.0f || isnan(_resO) || isinf(_resO))
+    {
+        return NAN;
+    }
+
+    float ratio = RS / _resO;
+
+    if (ratio <= 0.0f || isnan(ratio) || isinf(ratio))
+    {
+        return NAN;
+    }
+
+    return 0.4f * pow(ratio, -1.43068f);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -114,11 +133,31 @@ float MQ3::convertRawToPPM(float raw)
  */
 float MQ3::calculateRS()
 {
-  float raw = analogRead(ADC_PIN_SENSOR);
-  float adcVolt = raw * 3.3f / 4095.0f;
-  float sensorVolt = adcVolt * 1.5f; 
-  //float sensorVolt = sensorValue * (_isPower5v?5.0:3.3) / (_isPower5v?1024.0:675.84);
-  float RS = (_isPower5v?5.0:3.3) * _res2 / sensorVolt - _res2;
+    const float ADC_REF = 3.3f;
+    const float ADC_MAX = 4095.0f;
+    const float DIVIDER_FACTOR = 1.5f;
+    const float SENSOR_VCC = 5.0f;
 
-  return RS;
+    float raw = analogRead(_pin);
+    float adcVolt = raw * ADC_REF / ADC_MAX;
+    float sensorVolt = adcVolt * DIVIDER_FACTOR;
+
+    if (sensorVolt <= 0.01f)
+    {
+        return NAN;
+    }
+
+    if (sensorVolt >= SENSOR_VCC)
+    {
+        sensorVolt = SENSOR_VCC - 0.01f;
+    }
+
+    float RS = _res2 * ((SENSOR_VCC / sensorVolt) - 1.0f);
+
+    if (RS <= 0.0f || isnan(RS) || isinf(RS))
+    {
+        return NAN;
+    }
+
+    return RS;
 }
