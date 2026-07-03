@@ -17,7 +17,7 @@
 #define MQ3_H
 
 #include <Arduino.h>
-
+#pragma once
 #define AIR 60.0 // The RS/R0 ratio is a constant 60 in "clean air"
 
 /* Define types Unit of MQ-3 */
@@ -31,7 +31,7 @@ class MQ3
 public:
   MQ3(uint8_t pin, bool isPower5v=true, float res2=2000);
 
-  void begin();
+  void begin(uint32_t time);
   float readAlcoholConcentration(uint8_t unit=PPM);
   float readRawValueOfAlcohol(); // Unit (mg/L), based on ratio RS/RO
 

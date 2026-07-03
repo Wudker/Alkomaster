@@ -1,3 +1,4 @@
+#pragma once
 #include <Pins.h>
 extern char Battery_state[20];
 extern char alcohol_display[20];
@@ -16,4 +17,3 @@ void Peripheral_power_supply_OFF();
 void Heater_on();
 void Heater_off();
 float sensor_read();
-void Start_system();

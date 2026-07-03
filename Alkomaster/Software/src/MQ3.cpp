@@ -14,6 +14,7 @@
  */
 
 #include "MQ3.h"
+#include <Pins.h>
 
 /*!
  *  @brief  Instantiates a new MQ3 class
@@ -37,9 +38,9 @@ MQ3::MQ3(uint8_t pin, bool isPower5v, float res2)
  *  @brief  It will delay ~20s to heat probe sensor to ready
  *          Then calculate value RO based on RS
  */
-void MQ3::begin()
+void MQ3::begin(uint32_t time)
 {
-  delay(19000);
+  delay(time); //timer insted of delay(20000) to heat probe sensor to ready
   _resO=0;
 
   uint8_t count=10;
@@ -113,8 +114,10 @@ float MQ3::convertRawToPPM(float raw)
  */
 float MQ3::calculateRS()
 {
-  float sensorValue = analogRead(_pin);
-  float sensorVolt = sensorValue * (_isPower5v?5.0:3.3) / (_isPower5v?1024.0:675.84);
+  float raw = analogRead(ADC_PIN_SENSOR);
+  float adcVolt = raw * 3.3f / 4095.0f;
+  float sensorVolt = adcVolt * 1.5f; 
+  //float sensorVolt = sensorValue * (_isPower5v?5.0:3.3) / (_isPower5v?1024.0:675.84);
   float RS = (_isPower5v?5.0:3.3) * _res2 / sensorVolt - _res2;
 
   return RS;
