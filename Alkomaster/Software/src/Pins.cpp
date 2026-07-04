@@ -12,6 +12,7 @@ void PINS_init()
     pinMode(Wake_up_pin, INPUT);
     pinMode(Display_power_pin, OUTPUT);
     pinMode(Sensor_power_pin, OUTPUT);
+    pinMode(Battery_voltage_pin, INPUT);
     digitalWrite(Display_power_pin, LOW);
     digitalWrite(Sensor_power_pin, LOW);
 
