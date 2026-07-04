@@ -3,6 +3,7 @@
 #include "ESP32TimerInterrupt.h"
 #include <Pins.h>
 #include <General.h>
+#include <Screen.h>
 #define BATTERY_CHECKER_INTERVAL_US 10UL * 1000UL * 1000UL
 #define SENSOR_WARMUP_INTERVAL_US 60UL * 1000UL * 1000UL
 ESP32Timer ITimer0(0);
@@ -62,9 +63,7 @@ bool IRAM_ATTR Timer_Battery_checker(void *timerNo)
     if (Peripheral_power == HEATING || Peripheral_power == MEASURING)
     {
         float batteryPercent = Battery_percentage();
-        Serial.print("Battery: ");
-        Serial.print(batteryPercent);
-        Serial.println("%");
+        screen_printf(0, 1, "          Battery: %.1f%%", batteryPercent);
     }
     return true;
 }

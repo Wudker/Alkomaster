@@ -10,12 +10,13 @@
 
 
 
-
+extern float v_ref, resolution;
 extern Power_state Peripheral_power;
 extern uint32_t inactive_time;
 extern uint32_t lastActivity;
 bool sensorReady = false;
 extern bool Wakeup_flag;
+float high_score = 0.0f;
 
 
 
@@ -74,6 +75,9 @@ void loop()
             uint32_t heatingStartTime = millis();
             while (millis() - heatingStartTime < Heating_time)
             {
+                char buffer[20];
+                snprintf(buffer, sizeof(buffer), "Heating: %lu s", (Heating_time - (millis() - heatingStartTime)) / 1000);
+                screen_print(2, buffer);
                 delay(100);
             }
 
@@ -89,13 +93,8 @@ void loop()
             while (millis() - lastActivity < inactive_time)
             {
                 int raw = analogRead(ADC_PIN_SENSOR);
-                float voltage = raw * 3.3f / 4095.0f;
+                float voltage = raw * v_ref / resolution;
                 float alcohol = sensor_read();
-
-                Serial.printf("RAW=%d V=%.3f alcohol=%.6f\n",
-                              raw,
-                              voltage,
-                              alcohol);
 
                 if (isnan(alcohol) || isinf(alcohol))
                 {
@@ -103,7 +102,12 @@ void loop()
                 }
                 else
                 {
-                    screen_printf(2, 1, "%.4f", alcohol);
+                     high_score = alcohol;
+                    if (high_score < alcohol)
+                    {
+                        high_score = alcohol;
+                    }
+                    screen_printf(2, 1, "%.4f", high_score);
                 }
 
                 screen_printf(3, 1, "ADC:%d", raw);
@@ -111,8 +115,22 @@ void loop()
             }
 
             screen_clear();
-            Peripheral_power = SLEEP;
+            Peripheral_power = SHOW;
             break;
+
+
+            case SHOW:
+            {
+                screen_clear();
+                screen_print(1, "SHOW");//debug
+                screen_printf(2, 1, "Alcohol: %.4f", high_score);
+                lastActivity = millis();
+                while (millis() - lastActivity < inactive_time){
+                    delay(1);
+                }
+                Peripheral_power = SLEEP;
+                break;
+            }
         }
     }
 }
