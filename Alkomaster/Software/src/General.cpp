@@ -2,9 +2,9 @@
 #include <MQ3.h>
 #include <pins.h>
 #include <Screen.h>
-Power_state Peripheral_power = HEATING;
-uint32_t Heating_time =  2UL *60UL * 1000UL;   // 2 min
-uint32_t inactive_time = 1UL * 60UL * 1000UL;  // 1 min
+Power_state Peripheral_power = SLEEP;
+uint32_t Heating_time = 60UL * 1000UL;   // 60 s warm-up
+uint32_t inactive_time = 30UL * 1000UL;  // 30 s measurement
 
 float v_ref = 3.3f; // Reference voltage for ADC
 float divider = 2.0f; // Voltage divider ratio (1:1)
@@ -12,12 +12,14 @@ float resolution = 4095.0f; // ADC resolution (12-bit ADC)
 float battery_vmin = 3.2f; // Minimum battery voltage
 float battery_vmax = 4.2f; // Maximum battery voltage
 
+
+
 uint32_t heatingStart = 0;
 uint32_t lastActivity = 0;
 MQ3 Sensor(ADC_PIN_SENSOR, true, 1490.0f);
 
  void Sensor_Init(){
-    Sensor.begin(Heating_time);
+    Sensor.begin();
 }
 
 void Display_on(){
@@ -35,7 +37,6 @@ void Sensor_off(){
 void Sensor_on(){
     digitalWrite(Sensor_power_pin, HIGH);
     Sensor_Init();
-    
 }
 
 float readBatteryVoltage() {

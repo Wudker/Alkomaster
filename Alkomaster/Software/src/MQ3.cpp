@@ -38,17 +38,17 @@ MQ3::MQ3(uint8_t pin, bool isPower5v, float res2)
  *  @brief  It will delay ~20s to heat probe sensor to ready
  *          Then calculate value RO based on RS
  */
-void MQ3::begin(uint32_t time)
+void MQ3::begin()
 {
-  delay(time); //timer insted of delay to heat probe sensor to ready
+  //delay(time); //timer insted of delay to heat probe sensor to ready
   _resO=0;
 
-  uint8_t count=10;
+  uint8_t count=20;
   uint8_t i=count;
   while (i--)
   {
     _resO += (MQ3::calculateRS()/AIR); // Calculate the average of RO (RO = RS/60)
-    delay(100);
+    delay(50);
   }
   _resO /= (float)count;
 }

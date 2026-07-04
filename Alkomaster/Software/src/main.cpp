@@ -7,24 +7,9 @@
 #include <Pins.h>
 #include <General.h>
 #include <esp_sleep.h>
-// These define's must be placed at the beginning before #include "ESP32_New_TimerInterrupt.h"
-// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
-#define _TIMERINTERRUPT_LOGLEVEL_ 4
 
-// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
-#include "ESP32TimerInterrupt.h"
-#define PIN_D19 19 // Pin D19 mapped to pin GPIO9 of ESP32
-#define PIN_D3 3   // Pin D3 mapped to pin GPIO3/RX0 of ESP32
 
-#define TIMER0_INTERVAL_MS 1000
-#define TIMER0_DURATION_MS 5000
 
-#define TIMER1_INTERVAL_MS 3000
-#define TIMER1_DURATION_MS 15000
-
-// Init ESP32 timer 0 and 1
-ESP32Timer ITimer0(0);
-ESP32Timer ITimer1(1);
 
 extern Power_state Peripheral_power;
 extern uint32_t inactive_time;
@@ -32,19 +17,7 @@ extern uint32_t lastActivity;
 bool sensorReady = false;
 extern bool Wakeup_flag;
 
-bool IRAM_ATTR TimerHandler0(void *timerNo)
-{
 
-
-    return true;
-}
-
-bool IRAM_ATTR TimerHandler1(void *timerNo)
-{
-
-
-    return true;
-}
 
 void setup()
 {
@@ -53,21 +26,11 @@ void setup()
 
     PINS_init();
 
-    Display_on();          
-    delay(200);           
+         
+               
     Wire.begin(6, 5);
-    ITimer0.attachInterruptInterval(TIMER0_INTERVAL_MS * 1000, TimerHandler0);
-    ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS * 1000, TimerHandler1);
 
-    if (display_init())
-    {
-        Serial.println("[DISPLAY] Display initialized successfully!");
-        screen_print(0, "DISPLAY OK");
-    }
-    else
-    {
-        Serial.println("[ERROR] Display initialization failed!");
-    }
+
 
     Sensor_off();
 
@@ -95,8 +58,6 @@ void loop()
         
         case SLEEP:
         {
-            screen_print(1, "SLEEP"); //debug
-            delay(1000);
             Deep_sleep_init();
             break;
         }
@@ -104,8 +65,17 @@ void loop()
         case HEATING:
         {
             Display_on();
+            display_init();
+            delay(500);
             screen_print(1, "HEATING");//debug
+
             Sensor_on();
+
+            uint32_t heatingStartTime = millis();
+            while (millis() - heatingStartTime < Heating_time)
+            {
+                delay(100);
+            }
 
             Peripheral_power = MEASURING;
             break;
@@ -115,6 +85,7 @@ void loop()
         {
             screen_print(1, "MEASURING");//debug
             lastActivity = millis();
+
             while (millis() - lastActivity < inactive_time)
             {
                 int raw = analogRead(ADC_PIN_SENSOR);
@@ -136,7 +107,7 @@ void loop()
                 }
 
                 screen_printf(3, 1, "ADC:%d", raw);
-
+                delay(5);
             }
 
             screen_clear();

@@ -31,7 +31,7 @@ class MQ3
 public:
   MQ3(uint8_t pin, bool isPower5v=true, float res2=2000);
 
-  void begin(uint32_t time);
+  void begin();
   float readAlcoholConcentration(uint8_t unit=PPM);
   float readRawValueOfAlcohol(); // Unit (mg/L), based on ratio RS/RO
 
