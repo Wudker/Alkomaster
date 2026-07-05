@@ -20,4 +20,5 @@ void Sensor_off();
 void Sensor_on();
 float sensor_read();
 float Battery_percentage();
+void heating_init();
 

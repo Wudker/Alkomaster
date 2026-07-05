@@ -5,12 +5,13 @@
 #include <General.h>
 #include <Screen.h>
 #define BATTERY_CHECKER_INTERVAL_US 10UL * 1000UL * 1000UL
-#define SENSOR_WARMUP_INTERVAL_US 60UL * 1000UL * 1000UL
+#define SENSOR_WARMUP_INTERVAL_US 1200UL * 1000UL * 1000UL
 ESP32Timer ITimer0(0);
 ESP32Timer ITimer1(1);
 extern Power_state Peripheral_power;
 volatile bool sensorMinuteTimerExpiredFlag = false;
 bool Wakeup_flag=false;
+volatile bool Battery_checker_flag = false;
 
 void PINS_init()
 {
@@ -60,10 +61,22 @@ bool IRAM_ATTR Timer_SensorMinute(void *timerNo)
 
 bool IRAM_ATTR Timer_Battery_checker(void *timerNo)
 {
-    if (Peripheral_power == HEATING || Peripheral_power == MEASURING)
+    Battery_checker_flag = true;
+    return true;    
+}
+
+void handle_bettry_checker()
+{
+    if (!Battery_checker_flag)
+        return;
+
+    if (Battery_checker_flag)
     {
-        float batteryPercent = Battery_percentage();
-        screen_printf(0, 1, "          Battery: %.1f%%", batteryPercent);
+        float bettery = Battery_percentage();
+        screen_printf(0, 1, "Battery: %.2f%%", bettery);
     }
-    return true;
+    noInterrupts();
+    Battery_checker_flag = false;
+    interrupts();
+    
 }

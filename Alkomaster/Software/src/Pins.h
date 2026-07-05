@@ -14,3 +14,4 @@ bool sensorMinuteTimerExpired();
 bool IRAM_ATTR Timer_SensorMinute(void *timerNo);
 bool IRAM_ATTR Timer_Battery_checker(void *timerNo);
 float readBatteryVoltage();
+void handle_bettry_checker();

@@ -53,6 +53,7 @@ void setup()
 
 void loop()
 {
+    handle_bettry_checker();
     switch (Peripheral_power)
     {
 
@@ -65,25 +66,32 @@ void loop()
 
         case HEATING:
         {
-            Display_on();
-            display_init();
-            delay(500);
-            screen_print(1, "HEATING");//debug
+            static bool heatingStarted = false;
+            static uint32_t heatingStartTime = 0;
 
-            Sensor_on();
-
-            uint32_t heatingStartTime = millis();
-            while (millis() - heatingStartTime < Heating_time)
+            if (!heatingStarted)
             {
-                char buffer[20];
-                snprintf(buffer, sizeof(buffer), "Heating: %lu s", (Heating_time - (millis() - heatingStartTime)) / 1000);
-                screen_print(2, buffer);
-                delay(100);
+                heating_init();
+                screen_print(1, "HEATING");
+                heatingStartTime = millis();
+                heatingStarted = true;
             }
 
-            Peripheral_power = MEASURING;
+            if (millis() - heatingStartTime < Heating_time)
+            {
+                char buffer[20];
+                snprintf(buffer, sizeof(buffer), "Heating: %lu s",
+                        (Heating_time - (millis() - heatingStartTime)) / 1000);
+                screen_print(2, buffer);
+            }
+            else
+            {
+                heatingStarted = false;
+                Peripheral_power = MEASURING;
+            }
+
             break;
-        }
+    }
 
         case MEASURING:
         {
@@ -117,6 +125,7 @@ void loop()
             screen_clear();
             Peripheral_power = SHOW;
             break;
+        }
 
 
             case SHOW:
@@ -133,7 +142,7 @@ void loop()
             }
         }
     }
-}
+
 
 
 

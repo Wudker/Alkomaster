@@ -3,7 +3,7 @@
 #include <pins.h>
 #include <Screen.h>
 Power_state Peripheral_power = SLEEP;
-uint32_t Heating_time = 60UL * 1000UL;   // 60 s warm-up
+uint32_t Heating_time = 120UL * 1000UL;   // 120 s warm-up
 uint32_t inactive_time = 30UL * 1000UL;  // 30 s measurement
 
 float v_ref = 3.3f; // Reference voltage for ADC
@@ -66,4 +66,9 @@ float sensor_read(){
     float promile = percentBAC * 10.0f;
     return promile;
 }
-
+void heating_init(){
+            Display_on();
+            display_init();
+            delay(500);
+            Sensor_on();
+}
