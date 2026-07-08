@@ -27,9 +27,9 @@ void PINS_init()
 
 void Deep_sleep_init()
 {
-    digitalWrite(Display_power_pin, LOW);
-    digitalWrite(Sensor_power_pin, LOW);
-    delay(50);
+    Display_off();
+    Sensor_off();
+    delay(100);
 
     const gpio_num_t wakePin = (gpio_num_t)Wake_up_pin;
     const uint64_t wakeMask = 1ULL << Wake_up_pin;

@@ -2,8 +2,8 @@
 #include <Arduino.h>
 #define ADC_PIN_SENSOR 4
 #define Wake_up_pin 2
-#define Sensor_power_pin 8
-#define Display_power_pin 21
+#define Sensor_power_pin 1
+#define Display_power_pin 20
 #define Battery_voltage_pin 0
 
 

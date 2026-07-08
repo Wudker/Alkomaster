@@ -130,6 +130,7 @@ void loop()
 
             case SHOW:
             {
+                Sensor_off();
                 screen_clear();
                 screen_print(1, "SHOW");//debug
                 screen_printf(2, 1, "Alcohol: %.4f", high_score);
